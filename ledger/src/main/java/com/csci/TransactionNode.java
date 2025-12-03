@@ -1,14 +1,22 @@
 package com.csci;
 
+import com.google.gson.Gson;
+
+
 public class TransactionNode {
     
     // variables
+    private int accountNumber;
     private double balance; // balance for account after transaction
     private double transactionAmount; // transaction amount
     private String transactionStatement; // reason for transaction
 
     // -----------------------------------------------Setters----------------------------------------------------
 
+    protected void setAccountNumber(int newId){
+        accountNumber = newId;
+    }
+    
     protected void setBalance(double newBalance){
         balance = newBalance;
     }
@@ -23,6 +31,10 @@ public class TransactionNode {
 
     // -----------------------------------------------Getters-----------------------------------------------------
 
+    protected int getAccountNumber(){
+        return accountNumber;
+    }
+    
     protected double getBalance(){
         return balance;
     }
