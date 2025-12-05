@@ -1,8 +1,5 @@
 package com.csci;
 
-import com.google.gson.Gson;
-
-
 public class TransactionNode {
     
     // variables
@@ -45,5 +42,22 @@ public class TransactionNode {
 
     protected String getTransactionStatement(){
         return transactionStatement;
+    }
+
+    // ------------------------------------------------Misc--------------------------------------------------------
+
+    @Override
+    public String toString(){
+        return String.valueOf(accountNumber) + " | " + String.valueOf(transactionAmount) + " | " + transactionStatement + " | " + String.valueOf(balance);
+    }
+
+    protected boolean toCompare(TransactionNode other){
+
+        if(this.accountNumber == other.accountNumber && this.transactionAmount == other.transactionAmount 
+            && this.transactionStatement.compareTo(other.transactionStatement) == 0 && this.balance == other.balance){
+                return true;
+        } else {
+            return false;
+        }
     }
 }

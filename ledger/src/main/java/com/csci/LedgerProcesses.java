@@ -44,6 +44,71 @@ public class LedgerProcesses {
         return returnValue;
     }
 
+    protected void addToList(int accountNumber, double amount, String reason, double balance){
+
+        transactionList.add(makeNode(accountNumber, amount, reason, balance));
+    }
+
+    protected int getLocation(TransactionNode target){
+
+        int targetLocation = -1;
+
+        for(int i = 0; i < transactionList.size(); i++){
+            if(transactionList.get(i).toCompare(target) == true){
+                targetLocation = i;
+                break;
+            }
+        }
+
+        return targetLocation;
+    }
+
+    protected void updateAndRemove(TransactionNode removedNode){
+
+        int location = getLocation(removedNode);
+        double holderBalance = 0;
+        int account = removedNode.getAccountNumber();
+        boolean first = true;
+
+        if(location == -1){
+            System.out.println("An Error has Occured - updateAndRemove()");
+            return;
+        }
+
+        transactionList.remove(location);
+
+        for(int i = 0; i <= transactionList.size()-1; i++){
+            if(first && account == transactionList.get(i).getAccountNumber()){
+                transactionList.get(i).setBalance(transactionList.get(i).getTransactionAmount());
+                holderBalance = transactionList.get(i).getBalance();
+                first = false;
+            }
+            else if(account == transactionList.get(i).getAccountNumber()){
+                transactionList.get(i).setBalance(holderBalance + transactionList.get(i).getTransactionAmount());
+                holderBalance = transactionList.get(i).getBalance();
+            }
+        }
+    }
+
+    protected void updateList(TransactionNode changedNode){
+
+        double holderBalance = 0;
+        int account = changedNode.getAccountNumber();
+        boolean first = true;
+
+        for(int i = 0; i <= transactionList.size()-1; i++){
+            if(first && account == transactionList.get(i).getAccountNumber()){
+                transactionList.get(i).setBalance(transactionList.get(i).getTransactionAmount());
+                holderBalance = transactionList.get(i).getBalance();
+                first = false;
+            }
+            else if(account == transactionList.get(i).getAccountNumber()){
+                transactionList.get(i).setBalance(holderBalance + transactionList.get(i).getTransactionAmount());
+                holderBalance = transactionList.get(i).getBalance();
+            }
+        }
+    }
+
  // -------------------------------------------------------File---------------------------------------------------------
 
     public void setFile(File setFile){
@@ -92,24 +157,6 @@ public class LedgerProcesses {
 
  // ----------------------------------------------------Utilities-------------------------------------------------------
 
-    protected void editTransaction(double newAmount, String transactionStatement, TransactionNode oldTransaction){
-
-        // variables
-        boolean changeHasBeenMade = false;
-
-        // transaction changing
-        if(oldTransaction.getTransactionAmount() != newAmount && newAmount != 0){ // changes transaction amount
-            oldTransaction.setTransactionAmount(newAmount);
-            changeHasBeenMade = true;
-        }
-        if(oldTransaction.getTransactionStatement() != transactionStatement && !transactionStatement.isEmpty()){ // changes statement
-            oldTransaction.setTransactionStatement(transactionStatement);
-        }
-        if(changeHasBeenMade){ // updates balance if transaction amount has changed
-            oldTransaction.setBalance(oldTransaction.getBalance() - newAmount);
-        }
-    }
-
     protected static TransactionNode makeNode(int accountNumber, double amount, String TransactionStatement){
 
         // variables
@@ -120,7 +167,7 @@ public class LedgerProcesses {
         accountUpdated.setAccountNumber(accountNumber);
         accountUpdated.setTransactionAmount(amount);
         accountUpdated.setTransactionStatement(TransactionStatement);
-        for(int i = transactionList.size() - 1 ; i > 0; i--){
+        for(int i = transactionList.size() -1 ; i >= 0; i--){
             if(transactionList.get(i).getAccountNumber() == accountNumber){
                 tempHolder = i;
                 break;
@@ -152,8 +199,5 @@ public class LedgerProcesses {
         return accountUpdated;
     }
 
-    protected void addToList(int accountNumber, double amount, String reason, double balance){
-
-        transactionList.add(makeNode(accountNumber, amount, reason, balance));
-    }
+    
 }
