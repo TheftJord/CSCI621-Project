@@ -1,15 +1,25 @@
 package com.csci;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 
 public class PrimaryController {
 
     // ListStorage
     LedgerProcesses primary = new LedgerProcesses();
+
+    // File Interface Variables
+    FileChooser fileChooser = new FileChooser();
+    File current = null;
+    File selectedFile;
+    FileReader fr;
+    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
 
     // FXML variables
     @FXML
@@ -21,6 +31,26 @@ public class PrimaryController {
     @SuppressWarnings("rawtypes")
     @FXML
     private ListView display;
+
+    // -----------------------------------------------------------------Initializer------------------------------------------------------------------------
+
+    public void initialize(){
+
+        // set up file explorer
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        try{
+            current = new File(new File(".").getCanonicalPath());
+        } catch(IOException ex){
+            ex.printStackTrace();
+        }
+
+        fileChooser.setInitialDirectory(current);
+        
+        selectedFile = fileChooser.showOpenDialog(null);
+
+        primary.setFile(selectedFile);
+    }
     
     // ---------------------------------------------------------------Controller Methods-------------------------------------------------------------------
     
@@ -47,6 +77,8 @@ public class PrimaryController {
         }
         System.out.println("-------------------------------------------------------");
     }
+
+    
 
 
     // ---------------------------------------------------------------------Misc---------------------------------------------------------------------------

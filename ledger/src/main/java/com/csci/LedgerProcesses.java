@@ -1,12 +1,29 @@
 package com.csci;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.PrintStream;
 import java.util.LinkedList;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 public class LedgerProcesses {
+
+    // variables
+    private File selectedFile;
+    static LinkedList<TransactionNode> transactionList = new LinkedList<>();
+
+    // GSON variables needed
+    GsonBuilder builder = new GsonBuilder();
+    Gson gson = builder.create();
+    FileReader fr = null;
     
  // -------------------------------------------------List Functions-----------------------------------------------------
 
-    static LinkedList<TransactionNode> transactionList = new LinkedList<>();
+    
 
     protected LinkedList<String> toPrint(){
 
@@ -25,6 +42,52 @@ public class LedgerProcesses {
 
         // return
         return returnValue;
+    }
+
+ // -------------------------------------------------------File---------------------------------------------------------
+
+    public void setFile(File setFile){
+        this.selectedFile = setFile;
+    }
+
+    public void convertJsonToList(){
+        if(selectedFile != null){
+            LinkedList<TransactionNode> listData = new LinkedList<>();
+
+            transactionList.clear();
+
+            try{
+                fr = new FileReader(selectedFile.getName());
+            } catch(FileNotFoundException ex){
+                System.out.println("Error found in convertJsonToList");
+            }
+
+            listData = gson.fromJson(fr, new TypeToken<LinkedList<TransactionNode>>(){}.getType());
+
+            for(int i = 0; i < listData.size(); i++){
+                addToList(listData.get(i).getAccountNumber(), listData.get(i).getTransactionAmount(), listData.get(i).getTransactionStatement(), listData.get(i).getBalance());
+            }
+        } else {
+            System.out.println("Error found in convertJsonToList");
+        }
+    }
+
+    public void saveToJson(){
+        builder.setPrettyPrinting();
+
+        if(selectedFile != null){
+            String jsonString = gson.toJson(transactionList);
+            PrintStream ps;
+
+            try{
+                ps = new PrintStream(selectedFile.getPath());
+                ps.println(jsonString);
+            } catch(FileNotFoundException ex){
+                System.out.println("An Error has occured in saveToJson");
+            }
+        } else {
+            System.out.println("An Error has occured in saveToJson");
+        }
     }
 
  // ----------------------------------------------------Utilities-------------------------------------------------------
@@ -73,5 +136,24 @@ public class LedgerProcesses {
 
         // return value
         return accountUpdated;
+    }
+
+    protected static TransactionNode makeNode(int accountNumber, double amount, String reason, double Balance){
+        // variables
+        TransactionNode accountUpdated = new TransactionNode();
+
+        // update values
+        accountUpdated.setAccountNumber(accountNumber);
+        accountUpdated.setTransactionAmount(amount);
+        accountUpdated.setTransactionStatement(reason);
+        accountUpdated.setBalance(Balance);
+
+        // return value
+        return accountUpdated;
+    }
+
+    protected void addToList(int accountNumber, double amount, String reason, double balance){
+
+        transactionList.add(makeNode(accountNumber, amount, reason, balance));
     }
 }
